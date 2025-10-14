@@ -8,7 +8,7 @@ This document provides comprehensive examples of using the Docker Certificate Ac
 
 ```yaml
 - name: Install company CA certificate
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/company-ca.crt'
 ```
@@ -17,7 +17,7 @@ This document provides comprehensive examples of using the Docker Certificate Ac
 
 ```yaml
 - name: Install certificate from PKI server
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'https://pki.company.com/certs/root-ca.crt'
     certificate-name: 'company-root-ca.crt'
@@ -27,7 +27,7 @@ This document provides comprehensive examples of using the Docker Certificate Ac
 
 ```yaml
 - name: Install certificate from secret
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.CUSTOM_CA_CERT }}
@@ -40,13 +40,13 @@ This document provides comprehensive examples of using the Docker Certificate Ac
 
 ```yaml
 - name: Install root CA
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/root-ca.crt'
     certificate-name: 'root-ca.crt'
 
 - name: Install intermediate CA
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/intermediate-ca.crt'
     certificate-name: 'intermediate-ca.crt'
@@ -56,7 +56,7 @@ This document provides comprehensive examples of using the Docker Certificate Ac
 
 ```yaml
 - name: Install certificate with debugging
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/debug-ca.crt'
     debug: true
@@ -81,7 +81,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Install custom CA certificate
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: 'inline'
           certificate-body: ${{ secrets.COMPANY_CA_CERT }}
@@ -123,7 +123,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Install certificate from URL
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: 'https://pki.internal.net/ca/root.crt'
           debug: true
@@ -169,7 +169,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Install custom CA for internal PyPI
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: ${{ secrets.PYPI_CA_CERT }}
           certificate-name: 'internal-pypi-ca.crt'
@@ -205,7 +205,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Install custom CA for internal npm
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: 'https://pki.company.com/npm-ca.crt'
       
@@ -239,7 +239,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Install custom CA certificate
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: 'certs/internal-ca.crt'
       
@@ -262,7 +262,7 @@ jobs:
 
 ```yaml
 - name: Install certificate
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   id: install-cert
   with:
     certificate-source: 'certs/ca.crt'
@@ -286,7 +286,7 @@ jobs:
 
 ```yaml
 - name: Install certificate
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: ${{ secrets.REGISTRY_CA }}
     certificate-name: 'registry-ca.crt'
@@ -322,7 +322,7 @@ jobs:
 ```yaml
 - name: Install custom certificate
   if: ${{ env.CUSTOM_CERTIFICATE }}
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: '/certs/${{ env.CUSTOM_CERTIFICATE }}'
 ```
@@ -332,7 +332,7 @@ jobs:
 ```yaml
 - name: Install certificate (production only)
   if: github.ref == 'refs/heads/main'
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.PROD_CA_CERT }}
@@ -350,7 +350,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Install certificate from environment URL
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: ${{ env.CERT_URL }}
 ```
@@ -375,7 +375,7 @@ jobs:
       
       # Install corporate CA certificate
       - name: Install corporate CA
-        uses: ravensorb/actions/docker-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
         with:
           certificate-source: 'inline'
           certificate-body: ${{ secrets.CORPORATE_CA_CERT }}

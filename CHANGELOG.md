@@ -42,6 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First stable release
 
-[Unreleased]: https://github.com/ravensorb/actions/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/ravensorb/actions/releases/tag/docker-certificate-v1.0.0
+[Unreleased]: https://github.com/LiquidLogicLabs/actions/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/LiquidLogicLabs/actions/releases/tag/docker-certificate-v1.0.0
 

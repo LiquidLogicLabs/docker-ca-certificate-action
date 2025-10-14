@@ -60,10 +60,10 @@ You can test the action locally using [act](https://github.com/nektos/act):
 # See: https://github.com/nektos/act#installation
 
 # Run all tests
-act -W .github/workflows/test.yml
+act -W .github/workflows/ci-pre-release.yml
 
 # Run specific job
-act -W .github/workflows/test.yml -j test-local-file
+act -W .github/workflows/ci-pre-release.yml -j test-local-file
 ```
 
 ### Documentation

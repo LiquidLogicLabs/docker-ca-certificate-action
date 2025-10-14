@@ -28,7 +28,7 @@ This guide helps resolve common issues when using the Docker Certificate Action.
   uses: actions/checkout@v4  # Must run before using file paths
 
 - name: Install certificate
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/ca.crt'  # Relative to repo root
 ```
@@ -62,7 +62,7 @@ This guide helps resolve common issues when using the Docker Certificate Action.
     curl -k -o /tmp/ca.crt https://internal.server/ca.crt
 
 - name: Install certificate
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: '/tmp/ca.crt'
 ```
@@ -148,13 +148,13 @@ SSL certificate problem: unable to get local issuer certificate
 ```yaml
 # Install complete chain
 - name: Install root CA
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/root-ca.crt'
     certificate-name: 'root-ca.crt'
 
 - name: Install intermediate CA
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/intermediate-ca.crt'
     certificate-name: 'intermediate-ca.crt'
@@ -184,7 +184,7 @@ Error response from daemon: Get https://registry.example.com/v2/: x509: certific
 ```yaml
 # Correct order - certificate FIRST
 - name: Install certificate FIRST
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/ca.crt'
     debug: true
@@ -223,7 +223,7 @@ Error response from daemon: Get https://registry.example.com/v2/: x509: certific
 ```yaml
 # Correct inline usage
 - name: Install from secret
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.CA_CERTIFICATE }}
@@ -247,7 +247,7 @@ Error response from daemon: Get https://registry.example.com/v2/: x509: certific
 
 ```yaml
 - name: Install certificate with debug output
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/ca.crt'
     debug: true  # Enables verbose output

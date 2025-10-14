@@ -26,13 +26,13 @@ curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo ba
 
 ```bash
 # Run the test workflow
-act -W .github/workflows/test.yml
+act -W .github/workflows/ci-pre-release.yml
 
 # Run specific job
-act -W .github/workflows/test.yml -j test-local-file
+act -W .github/workflows/ci-pre-release.yml -j test-local-file
 
 # List all jobs without running
-act -W .github/workflows/test.yml -l
+act -W .github/workflows/ci-pre-release.yml -l
 ```
 
 ### 2. Create a Simple Test Workflow
@@ -100,21 +100,21 @@ openssl req -x509 -newkey rsa:2048 -keyout test-certs/test-key.pem \
   -subj "/C=US/ST=Test/L=Test/O=Test/CN=test.local"
 
 # Run test
-act -W .github/workflows/test.yml -j test-local-file
+act -W .github/workflows/ci-pre-release.yml -j test-local-file
 ```
 
 ### Test with URL
 
 ```bash
 # Run URL test
-act -W .github/workflows/test.yml -j test-url
+act -W .github/workflows/ci-pre-release.yml -j test-url
 ```
 
 ### Test with Inline Content
 
 ```bash
 # Run inline test
-act -W .github/workflows/test.yml -j test-inline
+act -W .github/workflows/ci-pre-release.yml -j test-inline
 ```
 
 ## Act Configuration
@@ -163,7 +163,7 @@ Error: Permission denied when installing certificate
 Act runs in Docker with limited permissions. Use `--privileged`:
 
 ```bash
-act -W .github/workflows/test.yml --privileged
+act -W .github/workflows/ci-pre-release.yml --privileged
 ```
 
 ### Issue: Action Not Found
@@ -177,8 +177,8 @@ Error: Unable to resolve action ./
 Ensure you're in the repository root:
 
 ```bash
-cd /home/ravenwolf.org/sanderson/source/git/ravensorb/actions/docker-certificate
-act -W .github/workflows/test.yml
+cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate
+act -W .github/workflows/ci-pre-release.yml
 ```
 
 ### Issue: Docker Image Too Small
@@ -216,54 +216,21 @@ act --secret-file .secrets
 
 ## Quick Test Script
 
-Create `test-local.sh`:
+The repository includes `act-build.sh` for convenient local testing:
 
 ```bash
-#!/bin/bash
-# Quick local test script
-
-set -e
-
-echo "🧪 Testing Docker Certificate Action locally with act"
-echo ""
-
-# Check if act is installed
-if ! command -v act &> /dev/null; then
-    echo "❌ act is not installed"
-    echo "Install: brew install act (macOS) or see https://github.com/nektos/act"
-    exit 1
-fi
-
-echo "✓ act is installed"
-echo ""
-
-# Create test certificate if not exists
-if [ ! -f test-certs/test-ca.crt ]; then
-    echo "📝 Creating test certificate..."
-    mkdir -p test-certs
-    openssl req -x509 -newkey rsa:2048 -keyout test-certs/test-key.pem \
-      -out test-certs/test-ca.crt -days 365 -nodes \
-      -subj "/C=US/ST=Test/L=Test/O=Test/CN=test.local" 2>/dev/null
-    echo "✓ Test certificate created"
-    echo ""
-fi
-
-# Run tests
-echo "🚀 Running local tests..."
-echo ""
-
-# Test 1: Local file
-echo "Test 1: Local file installation"
-act -W .github/workflows/test.yml -j test-local-file --privileged
-
-echo ""
-echo "✅ All tests passed!"
+./act-build.sh
 ```
 
-Make it executable:
+This script will:
+- ✅ Check if act is installed
+- ✅ Auto-create test certificates if needed
+- ✅ Run the full test suite from `ci-pre-release.yml`
+- ✅ Provide helpful next steps
+
+**What it runs:**
 ```bash
-chmod +x test-local.sh
-./test-local.sh
+act -W .github/workflows/ci-pre-release.yml -j test
 ```
 
 ## Testing Specific Features
@@ -332,14 +299,14 @@ jobs:
 
 ```bash
 # Enable debug logging
-act -W .github/workflows/test.yml -v --verbose
+act -W .github/workflows/ci-pre-release.yml -v --verbose
 ```
 
 ### Interactive Debugging
 
 ```bash
 # Drop into shell on failure
-act -W .github/workflows/test.yml --shell bash
+act -W .github/workflows/ci-pre-release.yml --shell bash
 ```
 
 ### Check Environment
@@ -387,15 +354,15 @@ echo "Running complete test suite with act..."
 
 # Test 1: Local file
 echo "1. Testing local file..."
-act -W .github/workflows/test.yml -j test-local-file --privileged
+act -W .github/workflows/ci-pre-release.yml -j test-local-file --privileged
 
 # Test 2: URL
 echo "2. Testing URL download..."
-act -W .github/workflows/test.yml -j test-url --privileged
+act -W .github/workflows/ci-pre-release.yml -j test-url --privileged
 
 # Test 3: Inline
 echo "3. Testing inline content..."
-act -W .github/workflows/test.yml -j test-inline --privileged
+act -W .github/workflows/ci-pre-release.yml -j test-inline --privileged
 
 echo ""
 echo "✅ All tests completed!"
@@ -439,13 +406,13 @@ After local testing passes:
 act -l
 
 # List jobs in specific workflow
-act -W .github/workflows/test.yml -l
+act -W .github/workflows/ci-pre-release.yml -l
 
 # Run specific job
-act -W .github/workflows/test.yml -j test-local-file
+act -W .github/workflows/ci-pre-release.yml -j test-local-file
 
 # Dry run (don't execute)
-act -W .github/workflows/test.yml -n
+act -W .github/workflows/ci-pre-release.yml -n
 
 # Use specific platform
 act -P ubuntu-latest=ubuntu:22.04

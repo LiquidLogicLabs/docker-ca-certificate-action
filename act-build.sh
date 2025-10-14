@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-local.sh - Quick local test with act
+# act-build.sh - Run tests locally using act (nektos/act)
 
 set -e
 
@@ -43,42 +43,19 @@ echo ""
 # Determine which tests to run
 TEST_SUITE=${1:-all}
 
-run_test() {
-    local test_name=$1
-    local job_name=$2
-    
-    echo ""
-    echo "▶ Test: $test_name"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    if act -W .github/workflows/test.yml -j "$job_name"; then
-        echo "✅ $test_name passed"
-    else
-        echo "❌ $test_name failed"
-        return 1
-    fi
-}
+# Run the test job from ci-pre-release workflow
+echo "▶ Running test suite from ci-pre-release.yml..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
-case $TEST_SUITE in
-    local|file)
-        run_test "Local file installation" "test-local-file"
-        ;;
-    url)
-        run_test "URL download" "test-url"
-        ;;
-    inline)
-        run_test "Inline content" "test-inline"
-        ;;
-    all)
-        run_test "Local file installation" "test-local-file"
-        run_test "URL download" "test-url"
-        run_test "Inline content" "test-inline"
-        ;;
-    *)
-        echo "Usage: $0 [all|local|url|inline]"
-        exit 1
-        ;;
-esac
+if act -W .github/workflows/ci-pre-release.yml -j test; then
+    echo ""
+    echo "✅ All tests passed"
+else
+    echo ""
+    echo "❌ Tests failed"
+    exit 1
+fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -89,6 +66,13 @@ echo "Next steps:"
 echo "  1. Review test output above"
 echo "  2. Fix any issues"
 echo "  3. Push to GitHub when ready"
-echo "  4. Release with: ./bump-version.sh major"
+echo "  4. Automatic pre-release will be created"
+echo ""
+echo "To create an official release:"
+echo "  ./release.sh [build_number]"
+echo ""
+echo "To bump version:"
+echo "  ./bump-version.sh minor  # 1.0 → 1.1"
+echo "  ./bump-version.sh major  # 1.x → 2.0"
 echo ""
 

@@ -83,21 +83,21 @@ Once the system trusts the certificate, all tools (Docker, curl, wget, pip, npm,
 
 ```yaml
 - name: Install custom certificate
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/company-ca.crt'
 ```
 
 ```yaml
 - name: Install certificate from URL
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'https://pki.company.com/ca.crt'
 ```
 
 ```yaml
 - name: Install certificate from secret
-  uses: ravensorb/actions/docker-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.CUSTOM_CA_CERT }}

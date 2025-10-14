@@ -34,7 +34,7 @@ chmod +x bump-version.sh
 
 ## 🌐 Method 2: GitHub UI (No Local Setup)
 
-1. Go to: https://github.com/ravensorb/actions/actions/workflows/manual-release.yml
+1. Go to: https://github.com/LiquidLogicLabs/actions/actions/workflows/manual-release.yml
 2. Click "Run workflow"
 3. Choose version bump type (patch/minor/major) OR enter specific version
 4. Click "Run workflow"
@@ -128,7 +128,7 @@ chmod +x bump-version.sh
 The script ensures you're releasing from main. Switch branches or modify the script if needed.
 
 **GitHub Actions not running:**
-Check: https://github.com/ravensorb/actions/actions
+Check: https://github.com/LiquidLogicLabs/actions/actions
 
 **Need to delete a release:**
 ```bash

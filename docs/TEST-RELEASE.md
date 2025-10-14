@@ -71,7 +71,7 @@ git tag -d v0.0.1-test
 
 Before running `./bump-version.sh major` for v1.0.0:
 
-- [ ] All tests passing (`.github/workflows/test.yml`)
+- [ ] All tests passing (`.github/workflows/ci-pre-release.yml`)
 - [ ] CHANGELOG.md has [Unreleased] section with content
 - [ ] README.md is complete
 - [ ] action.yml is correct
@@ -115,7 +115,7 @@ After your first release, verify:
 
 ### 1. GitHub Release Created
 ```
-✓ Go to: https://github.com/ravensorb/actions/releases
+✓ Go to: https://github.com/LiquidLogicLabs/actions/releases
 ✓ Release should be listed
 ✓ Changelog notes should be included
 ✓ Release assets (if any) should be present
@@ -135,12 +135,12 @@ git tag -l
 ### 3. Action Works
 ```yaml
 # Test in a workflow
-- uses: ravensorb/actions/docker-certificate@v1.0.0
+- uses: LiquidLogicLabs/docker-ca-certificate@v1.0.0
   with:
     certificate-source: 'test.crt'
 
 # And with major version
-- uses: ravensorb/actions/docker-certificate@v1
+- uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'test.crt'
 ```
@@ -200,7 +200,7 @@ git log --oneline -5
 ./bump-version.sh major
 
 # 4. Monitor
-# Watch: https://github.com/ravensorb/actions/actions
+# Watch: https://github.com/LiquidLogicLabs/actions/actions
 
 # 5. Verify
 # Check release appears

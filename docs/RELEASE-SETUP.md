@@ -179,7 +179,7 @@ chmod +x bump-version.sh
 Normal! The script defaults to v0.0.0 if no tags exist.
 
 ### GitHub Actions not running
-- Check: https://github.com/ravensorb/actions/actions
+- Check: https://github.com/LiquidLogicLabs/actions/actions
 - Verify you pushed the tag: `git push origin v1.0.1`
 - Check workflow permissions in repo settings
 

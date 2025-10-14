@@ -16,7 +16,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install custom certificate
-  uses: ravensorb/docker-certificate-action@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'certs/company-ca.crt'
 ```
@@ -25,7 +25,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install certificate from URL
-  uses: ravensorb/docker-certificate-action@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'https://pki.company.com/ca.crt'
 ```
@@ -34,7 +34,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install certificate from secret
-  uses: ravensorb/docker-certificate-action@v1
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.CUSTOM_CA_CERT }}
@@ -85,7 +85,7 @@ This action follows [Semantic Versioning](https://semver.org/).
 
 **Recommended usage:**
 ```yaml
-uses: ravensorb/docker-certificate-action@v1  # Gets latest v1.x.x
+uses: LiquidLogicLabs/docker-ca-certificate@v1  # Gets latest v1.x.x
 ```
 
 ## Documentation
@@ -96,7 +96,10 @@ uses: ravensorb/docker-certificate-action@v1  # Gets latest v1.x.x
 
 ### For Maintainers
 
-- 🧪 [Local Testing](docs/LOCAL-TESTING.md) - Test with act before pushing
+- 🔄 [Release Workflow](docs/RELEASE-WORKFLOW.md) - Complete CI/CD workflow guide
+- 🏷️ [Release Types](docs/RELEASE-TYPES.md) - Pre-release vs Official release
+- ⚡ [Quick Start: Releases](docs/QUICK-START-RELEASE.md) - TL;DR release guide
+- 🧪 [Local Testing](docs/LOCAL-TESTING.md) - Test with act (`./act-build.sh`)
 - 🚀 [Quick Release Guide](docs/QUICK-RELEASE.md) - One-command releases
 - 📦 [Publishing Guide](docs/PUBLISH.md) - Publishing to GitHub
 - ⚙️ [Release Setup](docs/RELEASE-SETUP.md) - Release automation setup
