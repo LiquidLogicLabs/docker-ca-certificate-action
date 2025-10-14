@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1] - 2025-10-14
+
 ### Added
 - Initial implementation of Docker Certificate Action
 - Support for three certificate input methods:
