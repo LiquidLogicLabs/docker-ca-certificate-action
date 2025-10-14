@@ -112,6 +112,11 @@ jobs:
         with:
           fetch-depth: 0  # Need full history for changelog
       
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
       - name: Generate version
         id: version
         run: |
