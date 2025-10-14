@@ -1,0 +1,39 @@
+# Test artifacts
+test-certs/
+*.pem
+*.key
+*.csr
+
+# Act secrets (don't commit)
+.secrets
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+dist/
+build/
+
+# Release notes (temporary)
+release-notes.md
+

@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get all history for changelog
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "major=$(echo $VERSION | cut -d. -f1)" >> $GITHUB_OUTPUT
+          echo "Releasing $VERSION"
+      
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Extract changelog section for this version
+          if [ -f CHANGELOG.md ]; then
+            NOTES=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '1d;$d' | sed '/^$/d')
+            
+            if [ -z "$NOTES" ]; then
+              NOTES="Release $VERSION"
+            fi
+          else
+            NOTES="Release $VERSION"
+          fi
+          
+          # Save to file for GitHub release
+          echo "$NOTES" > release-notes.md
+          
+          echo "Changelog extracted:"
+          cat release-notes.md
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Update major version tag
+        run: |
+          MAJOR_TAG="${{ steps.version.outputs.major }}"
+          
+          echo "Updating major version tag: $MAJOR_TAG"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Delete old major tag if it exists
+          git tag -d $MAJOR_TAG 2>/dev/null || true
+          git push origin :refs/tags/$MAJOR_TAG 2>/dev/null || true
+          
+          # Create new major tag pointing to current commit
+          git tag -a $MAJOR_TAG -m "Latest ${MAJOR_TAG}.x.x release"
+          git push origin $MAJOR_TAG
+          
+          echo "✓ Updated $MAJOR_TAG to point to ${{ steps.version.outputs.version }}"
+

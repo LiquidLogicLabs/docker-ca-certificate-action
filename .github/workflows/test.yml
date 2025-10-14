@@ -1,0 +1,101 @@
+name: Test Certificate Action
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-local-file:
+    runs-on: ubuntu-22.04
+    name: Test with local file
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Create test certificate
+        run: |
+          mkdir -p test-certs
+          # Create a self-signed certificate for testing
+          openssl req -x509 -newkey rsa:2048 -keyout test-certs/test-key.pem \
+            -out test-certs/test-ca.crt -days 365 -nodes \
+            -subj "/C=US/ST=Test/L=Test/O=Test/CN=test.example.com"
+      
+      - name: Install certificate from local file
+        uses: ./
+        with:
+          certificate-source: 'test-certs/test-ca.crt'
+          debug: 'true'
+      
+      - name: Verify installation
+        run: |
+          if [ -f /usr/local/share/ca-certificates/custom-ca-*.crt ]; then
+            echo "✓ Certificate installed to system CA store"
+          else
+            echo "✗ Certificate not found in system CA store"
+            exit 1
+          fi
+
+  test-url:
+    runs-on: ubuntu-22.04
+    name: Test with URL
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install certificate from URL
+        uses: ./
+        with:
+          certificate-source: 'https://curl.se/ca/cacert.pem'
+          certificate-name: 'curl-ca-bundle.crt'
+          debug: 'true'
+      
+      - name: Verify installation
+        run: |
+          if [ -f /usr/local/share/ca-certificates/curl-ca-bundle.crt ]; then
+            echo "✓ Certificate installed from URL"
+          else
+            echo "✗ Certificate not found"
+            exit 1
+          fi
+
+  test-inline:
+    runs-on: ubuntu-22.04
+    name: Test with inline content
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Create test certificate content
+        id: cert-content
+        run: |
+          # Create a self-signed certificate
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/test-key.pem \
+            -out /tmp/test-ca.crt -days 365 -nodes \
+            -subj "/C=US/ST=Test/L=Test/O=Test/CN=inline.example.com"
+          
+          # Read certificate content
+          CERT_CONTENT=$(cat /tmp/test-ca.crt)
+          echo "cert-content<<EOF" >> $GITHUB_OUTPUT
+          echo "$CERT_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Install certificate from inline content
+        uses: ./
+        with:
+          certificate-source: 'inline'
+          certificate-body: ${{ steps.cert-content.outputs.cert-content }}
+          certificate-name: 'inline-test.crt'
+          debug: 'true'
+      
+      - name: Verify installation
+        run: |
+          if [ -f /usr/local/share/ca-certificates/inline-test.crt ]; then
+            echo "✓ Certificate installed from inline content"
+          else
+            echo "✗ Certificate not found"
+            exit 1
+          fi
+
