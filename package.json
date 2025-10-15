@@ -3,6 +3,10 @@
   "version": "1.0.4",
   "description": "GitHub Action for installing custom SSL/TLS certificates",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LiquidLogicLabs/docker-ca-certificate-action.git"
+  },
   "scripts": {
     "release": "standard-version --release-as patch && git push --follow-tags origin HEAD",
     "release:patch": "standard-version --release-as patch && git push --follow-tags origin HEAD",

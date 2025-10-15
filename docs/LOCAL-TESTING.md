@@ -177,7 +177,7 @@ Error: Unable to resolve action ./
 Ensure you're in the repository root:
 
 ```bash
-cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate
+cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate-action
 act -W .github/workflows/ci-pre-release.yml
 ```
 

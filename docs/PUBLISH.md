@@ -15,7 +15,7 @@
 
 ```bash
 # Navigate to action directory
-cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate
+cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate-action
 
 # Initialize git (if not done)
 git init
@@ -32,7 +32,7 @@ git commit -m "feat: Initial release - Docker Certificate Action
 - Comprehensive error handling and validation"
 
 # Add GitHub remote
-git remote add origin https://github.com/LiquidLogicLabs/docker-ca-certificate.git
+git remote add origin https://github.com/LiquidLogicLabs/docker-ca-certificate-action.git
 
 # Push to GitHub
 git branch -M main
@@ -55,8 +55,8 @@ git push -u origin main
 
 ### Step 4: Verify
 
-1. **Check repository:** https://github.com/LiquidLogicLabs/docker-ca-certificate
-2. **Check release:** https://github.com/LiquidLogicLabs/docker-ca-certificate/releases
+1. **Check repository:** https://github.com/LiquidLogicLabs/docker-ca-certificate-action
+2. **Check release:** https://github.com/LiquidLogicLabs/docker-ca-certificate-action/releases
 3. **Check tags:** Should see both `v1.0.0` and `v1`
 
 ### Step 5: Test in Another Workflow
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Test certificate action
-        uses: LiquidLogicLabs/docker-ca-certificate@v1
+        uses: LiquidLogicLabs/docker-ca-certificate-action@v1
         with:
           certificate-source: 'https://curl.se/ca/cacert.pem'
           certificate-name: 'test.crt'
@@ -136,10 +136,10 @@ After publishing, update references in docs:
 
 ```yaml
 # Current examples use:
-uses: LiquidLogicLabs/docker-ca-certificate@v1
+uses: LiquidLogicLabs/docker-ca-certificate-action@v1
 
 # Change to:
-uses: LiquidLogicLabs/docker-ca-certificate@v1
+uses: LiquidLogicLabs/docker-ca-certificate-action@v1
 ```
 
 ### In EXAMPLES.md
@@ -226,11 +226,11 @@ Run these commands to publish right now:
 # Repository: docker-ca-certificate
 
 # 2. Run these commands
-cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate
+cd /home/ravenwolf.org/sanderson/source/git/LiquidLogicLabs/docker-ca-certificate-action
 git init
 git add .
 git commit -m "feat: Initial release - Docker Certificate Action"
-git remote add origin https://github.com/LiquidLogicLabs/docker-ca-certificate.git
+git remote add origin https://github.com/LiquidLogicLabs/docker-ca-certificate-action.git
 git branch -M main
 git push -u origin main
 
@@ -238,6 +238,6 @@ git push -u origin main
 ./bump-version.sh major
 
 # 4. Done! Check:
-# https://github.com/LiquidLogicLabs/docker-ca-certificate
+# https://github.com/LiquidLogicLabs/docker-ca-certificate-action
 ```
 

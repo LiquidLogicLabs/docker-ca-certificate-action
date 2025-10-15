@@ -8,46 +8,38 @@ The **simplest possible** release automation using `npx` and existing tools.
 
 ```bash
 # Full Releases (creates tag, triggers CI/CD pipeline)
-npx release:patch      # v1.0.1 → v1.0.2 (bug fixes)
-npx release:minor      # v1.0.1 → v1.1.0 (new features)
-npx release:major      # v1.0.1 → v2.0.0 (breaking changes)
+npm run release:patch      # v1.0.1 → v1.0.2 (bug fixes)
+npm run release:minor      # v1.0.1 → v1.1.0 (new features)
+npm run release:major      # v1.0.1 → v2.0.0 (breaking changes)
 
 # Pre-Releases (creates pre-release tag, triggers CI/CD pipeline)
-npx release:pre-alpha  # v1.0.1 → v1.0.2-alpha.0
-npx release:pre-beta   # v1.0.1 → v1.0.2-beta.0
-npx release:pre-rc     # v1.0.1 → v1.0.2-rc.0
-npx release:pre-dev    # v1.0.1 → v1.0.2-dev.0
+npm run release:pre-alpha  # v1.0.1 → v1.0.2-alpha.0
+npm run release:pre-beta   # v1.0.1 → v1.0.2-beta.0
+npm run release:pre-rc     # v1.0.1 → v1.0.2-rc.0
+npm run release:pre-dev    # v1.0.1 → v1.0.2-dev.0
 
 # Interactive mode (asks what type)
-npx release
+npm run release
 ```
 
 **That's it!** Commands create git tags which automatically trigger the CI/CD pipeline for testing, building, packaging, and releasing.
 
-### **Method 2: NPM Scripts**
+### **Method 2: Direct standard-version**
 
 ```bash
-# Using package.json scripts
-npm run release:patch   # 1.0.1 → 1.0.2
-npm run release:minor   # 1.0.1 → 1.1.0  
-npm run release:major   # 1.0.1 → 2.0.0
-npm run release         # Interactive mode
+# Direct standard-version commands
+npx standard-version --release-as patch   # 1.0.1 → 1.0.2
+npx standard-version --release-as minor   # 1.0.1 → 1.1.0  
+npx standard-version --release-as major   # 1.0.1 → 2.0.0
+npx standard-version                       # Interactive mode
 ```
 
-### **Method 3: Direct standard-version**
+### **Method 3: Local Testing**
 
 ```bash
-# Patch release (bug fixes)
-npx standard-version --release-as patch
-
-# Minor release (new features)  
-npx standard-version --release-as minor
-
-# Major release (breaking changes)
-npx standard-version --release-as major
-
-# Interactive mode (asks what type)
-npx standard-version
+# Test locally with act
+npm run test:local        # Run tests locally
+npm run ci:local          # Run full CI/CD pipeline locally
 ```
 
 ## 🏗️ **CI/CD Pipeline Architecture**
@@ -80,13 +72,6 @@ The release system uses a unified CI/CD pipeline that works on:
 3. **Build** - Validates and packages the action
 4. **Release** - Creates GitHub release (only on tag pushes)
 
-### **Local Testing:**
-
-```bash
-# Test locally with act
-npm run test:local        # Run tests locally
-npm run ci:local          # Run full CI/CD pipeline locally
-```
 
 ## 🎯 **What Happens Automatically**
 
@@ -159,7 +144,7 @@ Developer Flow:
 git commit -m "feat: add new certificate validation"
 
 # 2. Create alpha pre-release
-npx release:pre-alpha
+npm run release:pre-alpha
 
 # Result: v1.0.1 → v1.0.2-alpha.0
 # ✅ Pre-release created for testing
@@ -167,10 +152,10 @@ npx release:pre-alpha
 # ✅ Safe to iterate and test
 
 # 3. If more changes needed, increment pre-release
-npx release:pre-alpha  # v1.0.2-alpha.0 → v1.0.2-alpha.1
+npm run release:pre-alpha  # v1.0.2-alpha.0 → v1.0.2-alpha.1
 
 # 4. When ready, promote to full release
-npx release:patch      # v1.0.2-alpha.1 → v1.0.2
+npm run release:patch      # v1.0.2-alpha.1 → v1.0.2
 ```
 
 ### **Creating a Bug Fix Release**
@@ -180,7 +165,7 @@ npx release:patch      # v1.0.2-alpha.1 → v1.0.2
 git commit -m "fix: resolve certificate parsing error"
 
 # 2. Create patch release
-npx release:patch
+npm run release:patch
 
 # Result: v1.0.1 → v1.0.2
 # ✅ Changelog updated
@@ -195,7 +180,7 @@ npx release:patch
 git commit -m "feat: add support for multiple certificate formats"
 
 # 2. Create minor release
-npx release:minor
+npm run release:minor
 
 # Result: v1.0.2 → v1.1.0
 # ✅ Changelog updated with new feature
@@ -210,7 +195,7 @@ npx release:minor
 git commit -m "feat!: rename certificate-source to cert-source"
 
 # 2. Create major release
-npx release:major
+npm run release:major
 
 # Result: v1.1.0 → v2.0.0
 # ✅ Changelog updated with breaking changes

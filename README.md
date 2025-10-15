@@ -17,7 +17,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install custom certificate
-  uses: LiquidLogicLabs/docker-ca-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
   with:
     certificate-source: 'certs/company-ca.crt'
 ```
@@ -26,7 +26,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install certificate from URL
-  uses: LiquidLogicLabs/docker-ca-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
   with:
     certificate-source: 'https://pki.company.com/ca.crt'
 ```
@@ -35,7 +35,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install certificate from secret
-  uses: LiquidLogicLabs/docker-ca-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.CUSTOM_CA_CERT }}
@@ -47,7 +47,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 ```yaml
 - name: Install certificate and generate buildkit.toml
   id: install-cert
-  uses: LiquidLogicLabs/docker-ca-certificate@v1
+  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
   with:
     certificate-source: 'certs/company-ca.crt'
     generate-buildkit: 'true'
@@ -108,8 +108,18 @@ This action follows [Semantic Versioning](https://semver.org/).
 
 **Recommended usage:**
 ```yaml
-uses: LiquidLogicLabs/docker-ca-certificate@v1  # Gets latest v1.x.x
+uses: LiquidLogicLabs/docker-ca-certificate-action@v1  # Gets latest v1.x.x
 ```
+
+## 🚀 Quick Release
+
+```bash
+npm run release:patch      # Bug fixes
+npm run release:minor      # New features  
+npm run release:major      # Breaking changes
+```
+
+See [docs/RELEASE.md](docs/RELEASE.md) for full release automation guide.
 
 ## Documentation
 

@@ -312,7 +312,7 @@ jobs:
           ### Usage
           
           \`\`\`yaml
-          - uses: LiquidLogicLabs/docker-ca-certificate@$TAG_NAME
+          - uses: LiquidLogicLabs/docker-ca-certificate-action@$TAG_NAME
             with:
               certificate-source: 'path/to/cert.crt'
           \`\`\`
