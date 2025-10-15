@@ -93,6 +93,52 @@ jobs:
             exit 1
           fi
       
+      # Test 4: buildkit.toml generation
+      - name: Create test certificate for buildkit
+        run: |
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/buildkit-key.pem \
+            -out /tmp/buildkit-ca.crt -days 365 -nodes \
+            -subj "/C=US/ST=Test/L=Test/O=Test/CN=buildkit.example.com"
+      
+      - name: Test - buildkit.toml generation
+        id: buildkit-test
+        uses: ./
+        with:
+          certificate-source: '/tmp/buildkit-ca.crt'
+          certificate-name: 'buildkit-test.crt'
+          generate-buildkit: 'true'
+          debug: 'true'
+      
+      - name: Verify buildkit.toml generation
+        run: |
+          BUILDKIT_PATH="${{ steps.buildkit-test.outputs.buildkit-path }}"
+          if [ -f "$BUILDKIT_PATH" ]; then
+            echo "✓ buildkit.toml generated successfully"
+            echo "  Path: $BUILDKIT_PATH"
+            
+            # Verify buildkit.toml content
+            if grep -q "buildkit-test.crt" "$BUILDKIT_PATH"; then
+              echo "✓ buildkit.toml contains correct certificate path"
+            else
+              echo "✗ buildkit.toml does not contain certificate path"
+              exit 1
+            fi
+            
+            # Verify buildkit.toml structure
+            if grep -q "\[worker.oci\]" "$BUILDKIT_PATH"; then
+              echo "✓ buildkit.toml has correct structure"
+            else
+              echo "✗ buildkit.toml missing required sections"
+              exit 1
+            fi
+            
+            echo "buildkit.toml content:"
+            cat "$BUILDKIT_PATH"
+          else
+            echo "✗ buildkit.toml not generated"
+            exit 1
+          fi
+      
       - name: All tests passed
         run: |
           echo ""

@@ -6,6 +6,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 - 📁 **Multiple Input Methods**: Local file, URL, or inline certificate content
 - 🔒 **System Integration**: Installs to system CA store and runs `update-ca-certificates`
+- 🐳 **BuildKit Support**: Optional generation of `buildkit.toml` configuration file
 - ✅ **Simple**: Just install the cert - Docker will automatically trust it
 - 🛡️ **Robust**: Comprehensive error handling and validation
 - 🔄 **Idempotent**: Safe to run multiple times
@@ -41,6 +42,24 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
     certificate-name: 'company-ca.crt'
 ```
 
+### With BuildKit Configuration
+
+```yaml
+- name: Install certificate and generate buildkit.toml
+  id: install-cert
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
+  with:
+    certificate-source: 'certs/company-ca.crt'
+    generate-buildkit: 'true'
+
+- name: Use buildkit.toml for Docker builds
+  run: |
+    echo "buildkit.toml generated at: ${{ steps.install-cert.outputs.buildkit-path }}"
+    # Copy to Docker BuildKit config directory
+    mkdir -p ~/.docker/buildx
+    cp ${{ steps.install-cert.outputs.buildkit-path }} ~/.docker/buildx/config.toml
+```
+
 📚 **More examples:** See [docs/EXAMPLES.md](docs/EXAMPLES.md)
 
 ## Inputs
@@ -51,19 +70,23 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 | `certificate-body` | Certificate content (required when source is 'inline') | No | - |
 | `certificate-name` | Name for certificate file | No | Auto-generated |
 | `debug` | Enable debug output | No | `false` |
+| `generate-buildkit` | Generate buildkit.toml configuration file | No | `false` |
 
 ## Outputs
 
 | Output | Description |
 |--------|-------------|
 | `certificate-path` | Path where certificate was installed |
+| `certificate-name` | Name of the installed certificate file |
+| `buildkit-path` | Path to the generated buildkit.toml file (only set if generate-buildkit is true) |
 
 ## How It Works
 
 1. **Acquires Certificate**: Downloads/reads certificate from specified source
 2. **Validates Format**: Ensures certificate is valid PEM format
 3. **System Installation**: Copies to `/usr/local/share/ca-certificates/` and runs `update-ca-certificates`
-4. **Reports Success**: Outputs installation path and status
+4. **BuildKit Configuration** (optional): Generates `buildkit.toml` file with CA certificate settings
+5. **Reports Success**: Outputs installation path, certificate name, and buildkit.toml path
 
 Once installed, the certificate is trusted by:
 - ✅ Docker (push/pull from registries with custom certs)

@@ -25,6 +25,11 @@ inputs:
     description: 'Enable debug output'
     required: false
     default: 'false'
+  
+  generate-buildkit:
+    description: 'Generate buildkit.toml configuration file with CA certificate settings'
+    required: false
+    default: 'false'
 
 outputs:
   certificate-path:
@@ -34,6 +39,10 @@ outputs:
   certificate-name:
     description: 'Name of the installed certificate file'
     value: ${{ steps.install-cert.outputs.certificate-name }}
+  
+  buildkit-path:
+    description: 'Path to the generated buildkit.toml file (only set if generate-buildkit is true)'
+    value: ${{ steps.install-cert.outputs.buildkit-path }}
 
 runs:
   using: 'composite'
@@ -47,4 +56,5 @@ runs:
         INPUT_CERTIFICATE_BODY: ${{ inputs.certificate-body }}
         INPUT_CERTIFICATE_NAME: ${{ inputs.certificate-name }}
         INPUT_DEBUG: ${{ inputs.debug }}
+        INPUT_GENERATE_BUILDKIT: ${{ inputs.generate-buildkit }}
 

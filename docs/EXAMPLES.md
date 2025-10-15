@@ -62,9 +62,34 @@ This document provides comprehensive examples of using the Docker Certificate Ac
     debug: true
 ```
 
+### 6. Generate BuildKit Configuration
+
+```yaml
+- name: Install certificate and generate buildkit.toml
+  id: install-cert
+  uses: LiquidLogicLabs/docker-ca-certificate@v1
+  with:
+    certificate-source: 'certs/company-ca.crt'
+    certificate-name: 'company-ca.crt'
+    generate-buildkit: 'true'
+    debug: true
+
+- name: Setup Docker BuildKit with custom CA
+  run: |
+    echo "buildkit.toml generated at: ${{ steps.install-cert.outputs.buildkit-path }}"
+    
+    # Copy buildkit.toml to Docker BuildKit config directory
+    mkdir -p ~/.docker/buildx
+    cp "${{ steps.install-cert.outputs.buildkit-path }}" ~/.docker/buildx/config.toml
+    
+    # Verify the configuration
+    echo "BuildKit configuration:"
+    cat ~/.docker/buildx/config.toml
+```
+
 ## Complete Workflow Examples
 
-### 6. Build and Push to Private Registry
+### 7. Build and Push to Private Registry
 
 ```yaml
 name: Build Docker Image
@@ -105,7 +130,7 @@ jobs:
           tags: registry.company.com/myapp:latest
 ```
 
-### 7. Multi-Platform Build with Custom Certificate
+### 8. Multi-Platform Build with Custom Certificate
 
 ```yaml
 name: Multi-Platform Build
@@ -152,7 +177,7 @@ jobs:
             harbor.internal.net/myapp:latest
 ```
 
-### 8. Python Package Build with Internal PyPI
+### 9. Python Package Build with Internal PyPI
 
 ```yaml
 name: Build Python Package
@@ -188,7 +213,7 @@ jobs:
           python -m build
 ```
 
-### 9. Node.js Build with Internal npm Registry
+### 10. Node.js Build with Internal npm Registry
 
 ```yaml
 name: Build Node.js App
@@ -222,7 +247,7 @@ jobs:
         run: npm run build
 ```
 
-### 10. Docker Build with Internal Resources
+### 11. Docker Build with Internal Resources
 
 ```yaml
 name: Docker Build with Internal Resources
@@ -258,7 +283,7 @@ jobs:
 
 ## Troubleshooting Examples
 
-### 11. Verify Certificate Installation
+### 12. Verify Certificate Installation
 
 ```yaml
 - name: Install certificate
@@ -282,7 +307,7 @@ jobs:
     openssl verify -CApath /etc/ssl/certs ${{ steps.install-cert.outputs.certificate-path }}
 ```
 
-### 12. Test Registry Connection After Installation
+### 13. Test Registry Connection After Installation
 
 ```yaml
 - name: Install certificate
@@ -304,7 +329,7 @@ jobs:
 
 ## Integration with Existing Workflows
 
-### 13. Replace Existing Certificate Installation
+### 14. Replace Existing Certificate Installation
 
 **Before:**
 ```yaml
@@ -327,7 +352,7 @@ jobs:
     certificate-source: '/certs/${{ env.CUSTOM_CERTIFICATE }}'
 ```
 
-### 14. Conditional Certificate Installation
+### 15. Conditional Certificate Installation
 
 ```yaml
 - name: Install certificate (production only)
@@ -339,7 +364,7 @@ jobs:
     certificate-name: 'prod-ca.crt'
 ```
 
-### 15. Dynamic Certificate from Environment
+### 16. Dynamic Certificate from Environment
 
 ```yaml
 env:
@@ -357,7 +382,7 @@ jobs:
 
 ## Real-World Use Cases
 
-### 16. Corporate Infrastructure Build
+### 17. Corporate Infrastructure Build
 
 ```yaml
 name: Corporate Build Pipeline
@@ -406,4 +431,64 @@ jobs:
           # - npm.corp.internal (Node packages)
           # - maven.corp.internal (Java packages)
           # - Any other internal HTTPS service
+```
+
+### 18. Advanced BuildKit Configuration with Custom CA
+
+```yaml
+name: BuildKit with Custom CA Configuration
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install certificate and generate buildkit.toml
+        id: cert-install
+        uses: LiquidLogicLabs/docker-ca-certificate@v1
+        with:
+          certificate-source: 'inline'
+          certificate-body: ${{ secrets.COMPANY_CA_CERT }}
+          certificate-name: 'company-ca.crt'
+          generate-buildkit: 'true'
+          debug: true
+      
+      - name: Setup Docker BuildKit with custom configuration
+        run: |
+          # Create BuildKit configuration directory
+          mkdir -p ~/.docker/buildx
+          
+          # Copy generated buildkit.toml to BuildKit config
+          cp "${{ steps.cert-install.outputs.buildkit-path }}" ~/.docker/buildx/config.toml
+          
+          # Display the configuration for verification
+          echo "BuildKit configuration applied:"
+          cat ~/.docker/buildx/config.toml
+          
+          # Create a new BuildKit builder instance
+          docker buildx create --name custom-builder --use
+          docker buildx inspect --bootstrap
+      
+      - name: Build with custom BuildKit configuration
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          builder: custom-builder
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            registry.company.com/myapp:${{ github.sha }}
+            registry.company.com/myapp:latest
+          # BuildKit will now use the custom CA certificate
+          # for all registry operations and internal resource access
+      
+      - name: Cleanup BuildKit builder
+        run: |
+          docker buildx rm custom-builder || true
 ```
