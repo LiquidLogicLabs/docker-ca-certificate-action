@@ -1,45 +1,13 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### [1.0.2](https://github.com/LiquidLogicLabs/docker-ca-certificate-action/compare/v1.0.1...v1.0.2) (2025-10-15)
 
-## [Unreleased]
 
-## [1.2] - 2025-10-15
+### Features
 
-## [v1] - 2025-10-14
-
-### Added
-- Initial implementation of Docker Certificate Action
-- Support for three certificate input methods:
-  - Local file path
-  - URL (HTTP/HTTPS)
-  - Inline certificate content
-- System CA store installation
-- Docker registry certificate configuration
-- Comprehensive error handling and validation
-- Debug mode support
-- Skip options for selective installation
-- Output variables for certificate path and name
-- Comprehensive documentation and examples
-- Test workflow suite
-
-### Changed
-- N/A (initial release)
-
-### Deprecated
-- N/A (initial release)
-
-### Removed
-- N/A (initial release)
-
-### Fixed
-- N/A (initial release)
-
-### Security
-- N/A (initial release)
+* implement unified CI/CD pipeline with tag-based releases ([cd9fadd](https://github.com/LiquidLogicLabs/docker-ca-certificate-action/commit/cd9fadd2e8538338bcb283bf3d9291d6472a2814))
 
 ## [1.0.0] - TBD (Pending First Release)
 
@@ -48,4 +16,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/LiquidLogicLabs/actions/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/LiquidLogicLabs/actions/releases/tag/docker-certificate-v1.0.0
-
