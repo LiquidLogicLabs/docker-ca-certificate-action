@@ -4,7 +4,7 @@ This directory contains the CI/CD workflows for the Docker CA Certificate Action
 
 ## Workflows
 
-### `ci-pre-release.yml` - The Only Workflow You Need
+### `ci.yml` - Testing & Pre-Releases
 
 **Triggers:**
 - Push to `main` or `develop` branches
@@ -15,6 +15,7 @@ This directory contains the CI/CD workflows for the Docker CA Certificate Action
    - Local file installation
    - URL download
    - Inline certificate content
+   - BuildKit.toml generation
    - Debug mode validation
 
 2. **Pre-Release Creation** (only on push to main/develop, not on PRs):
@@ -25,141 +26,131 @@ This directory contains the CI/CD workflows for the Docker CA Certificate Action
 
 **Example output:** `v1.0.45-a3f2b1c`
 
-### Official Releases - Use Local Script
+### `release.yml` - Official Releases
 
-For official releases, use the `release.sh` script instead of a workflow:
+**Triggers:**
+- Push of version tags (v*.*.*)
+- Manual workflow dispatch
+
+**What it does:**
+1. **Quick Validation**: Runs essential tests before release
+2. **Automatic Release Creation**:
+   - Extracts version from git tag
+   - Generates release notes from changelog
+   - Creates GitHub release
+   - Updates major version tags (v1, v2, etc.)
+
+**Safety Features:**
+- ✅ **Pre-release validation**: Runs quick tests before creating release
+- ✅ **BuildKit testing**: Validates the new BuildKit feature
+- ✅ **Certificate validation**: Ensures basic functionality works
+
+**Example:** When you push tag `v1.0.2`, it validates the action works, then creates the GitHub release.
+
+## Release Process
+
+### **Ultra-Simple Releases**
+
+The release process is now **extremely simple**:
 
 ```bash
-./release.sh [build_number]
+# Create a patch release (bug fixes)
+npx standard-version --release-as patch
+
+# Create a minor release (new features)  
+npx standard-version --release-as minor
+
+# Create a major release (breaking changes)
+npx standard-version --release-as major
 ```
 
-**Why no workflow?**
-- ✅ Local script is faster (no waiting for GitHub Actions)
-- ✅ Better control (review before pushing)
-- ✅ Better UX (colored output, prompts, previews)
-- ✅ More reliable (works offline, better error handling)
-- ✅ Simpler architecture (fewer moving parts)
+**That's it!** The command will:
+- ✅ Bump version in package.json
+- ✅ Generate changelog from conventional commits
+- ✅ Create git tag
+- ✅ Push to GitHub
+- ✅ Trigger `release.yml` to create GitHub release
+
+### **Conventional Commits**
+
+Use conventional commit format for automatic changelog generation:
+
+```bash
+# Bug fixes
+git commit -m "fix: resolve certificate validation issue"
+
+# New features  
+git commit -m "feat: add buildkit.toml generation support"
+
+# Breaking changes
+git commit -m "feat!: change input parameter names"
+
+# Documentation
+git commit -m "docs: update installation guide"
+```
 
 ## Versioning
 
 ### Version Source
-Versions are derived from **git tags**. The system examines the latest official release tag to determine the current `major.minor` version.
-
-To bump versions:
-```bash
-# Bump minor version (1.0 → 1.1)
-./bump-version.sh minor
-
-# Bump major version (1.x → 2.0)
-./bump-version.sh major
-```
-
-This creates an initial release with the new version (e.g., `v1.1.1` or `v2.0.1`).
-
-### Build Numbers
-Build numbers come from GitHub Actions run number, ensuring unique, sequential builds.
+Versions are derived from **git tags** using semantic versioning.
 
 ### Version Formats
 
 | Type | Format | Example | Created By |
 |------|--------|---------|------------|
 | Pre-Release | `v{major}.{minor}.{build}-{sha}` | `v1.0.45-a3f2b1c` | Automatic on push |
-| Official Release | `v{major}.{minor}.{build}` | `v1.0.45` | Manual via `release.sh` |
+| Official Release | `v{major}.{minor}.{patch}` | `v1.0.2` | `npx standard-version` |
 | Major Version Tag | `v{major}` | `v1` | Automatic (points to latest) |
 
-## Permissions
-
-Workflows require:
-- `contents: write` - To create tags and releases
-
-Ensure the `GITHUB_TOKEN` has appropriate permissions in repository settings.
-
-## Secrets
-
-No secrets are required for basic operation. All workflows use the default `GITHUB_TOKEN`.
-
-## Local Testing
-
-Use the `release.sh` script for local release creation:
-
-```bash
-# Create release from latest pre-release
-./release.sh
-
-# Or specify build number
-./release.sh 45
-```
-
-## Architecture
+## Workflow Dependencies
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         CI/CD Flow                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  Developer Push to main/develop                              │
-│           ↓                                                  │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │  GitHub Actions: ci-pre-release.yml                    │ │
-│  │  1. Run Tests                                          │ │
-│  │  2. Create Pre-Release (if tests pass)                │ │
-│  │     → v1.0.45-a3f2b1c                                  │ │
-│  └────────────────────────────────────────────────────────┘ │
-│           ↓                                                  │
-│  Test pre-release in staging                                 │
-│           ↓                                                  │
-│  When ready for production:                                  │
-│           ↓                                                  │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │  Local: ./release.sh 45                                │ │
-│  │  1. Validate environment                               │ │
-│  │  2. Generate changelog                                 │ │
-│  │  3. Create official release                            │ │
-│  │     → v1.0.45                                          │ │
-│  │  4. Update major tag                                   │ │
-│  │     → v1 → v1.0.45                                     │ │
-│  └────────────────────────────────────────────────────────┘ │
-│                                                              │
+│                    WORKFLOW DEPENDENCIES                   │
+└─────────────────────────────────────────────────────────────┘
+
+Development Flow:
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+│   Commit    │───▶│     ci.yml   │───▶│   Release   │
+│   & Push    │    │ (Automatic)  │    │ (Manual)    │
+└─────────────┘    └──────────────┘    └─────────────┘
+                           │                    │
+                           ▼                    ▼
+                    ┌──────────────┐    ┌─────────────┐
+                    │ v1.0.45-abc  │    │  v1.0.45   │
+                    │ (Pre-release)│    │ (Official)  │
+                    │ + Full Tests │    │ + Validation│
+                    └──────────────┘    └─────────────┘
+
+Release Safety:
+┌─────────────────────────────────────────────────────────────┐
+│  Release workflow includes quick validation tests          │
+│  to ensure action works before creating GitHub release     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Philosophy:** Keep CI/CD simple. One workflow for automation, one script for manual releases.
+## Tools Used
 
-## Troubleshooting
+- **standard-version**: Industry-standard release automation
+- **conventional-changelog**: Automatic changelog generation  
+- **GitHub Actions**: Automated testing and release creation
+- **act**: Local testing of GitHub Actions
 
-### Workflow Not Triggering
+## Quick Reference
 
-Check:
-1. You pushed to `main` or `develop`
-2. Workflow file is in `.github/workflows/`
-3. YAML syntax is valid
-4. Repository permissions allow Actions
+### **Testing Locally**
+```bash
+./act-build.sh  # Run all tests locally
+```
 
-### Pre-Release Not Created
+### **Creating Releases**
+```bash
+npx standard-version --release-as patch   # Bug fix
+npx standard-version --release-as minor   # New feature
+npx standard-version --release-as major   # Breaking change
+```
 
-Check:
-1. Tests passed (see Actions tab)
-2. You have write permissions
-3. `GITHUB_TOKEN` has `contents: write` permission
-
-### Release Failed
-
-Check:
-1. Version tag doesn't already exist
-2. VERSION file exists and is valid
-3. No uncommitted changes
-4. You're on `main` branch
-
-## Documentation
-
-For detailed usage:
-- [Complete Release Workflow Guide](../../docs/RELEASE-WORKFLOW.md)
-- [Quick Start Guide](../../docs/QUICK-START-RELEASE.md)
-
-## Contact
-
-For issues or questions about the workflow:
-- Open an issue in the repository
-- Check existing documentation
-- Review workflow logs in Actions tab
-
+### **Viewing Releases**
+- **Pre-releases**: GitHub Actions tab → ci-pre-release
+- **Official releases**: GitHub Releases page
+- **Local testing**: `act-build.sh` script

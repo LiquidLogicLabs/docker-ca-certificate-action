@@ -1,0 +1,373 @@
+name: CI/CD Pipeline
+
+# Works on GitHub Actions, Gitea Actions, and locally with act
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*.*.*'
+    # Skip on documentation-only changes (only applies to branch pushes)
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'README.md'
+      - 'LICENSE'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'README.md'
+      - 'LICENSE'
+
+# Compatible with GitHub Actions, Gitea Actions, and act
+permissions:
+  contents: write
+
+env:
+  # Environment variables for cross-platform compatibility
+  NODE_VERSION: '18'
+  UBUNTU_VERSION: 'ubuntu-22.04'
+
+jobs:
+  # Job 1: Detect changes and determine pipeline behavior
+  detect-changes:
+    runs-on: ${{ env.UBUNTU_VERSION }}
+    outputs:
+      has-code-changes: ${{ steps.changes.outputs.code }}
+      has-docs-changes: ${{ steps.changes.outputs.docs }}
+      is-tag-push: ${{ steps.tag.outputs.is-tag }}
+      tag-name: ${{ steps.tag.outputs.name }}
+      release-type: ${{ steps.tag.outputs.release-type }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Detect changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For PRs, check what files changed
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          else
+            # For pushes, check last commit
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+          fi
+          
+          # Check if there are code changes (not just docs)
+          if echo "$CHANGED_FILES" | grep -v -E '\.(md|txt)$|^docs/|^README|^LICENSE' | grep -q .; then
+            echo "code=true" >> $GITHUB_OUTPUT
+          else
+            echo "code=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check if there are documentation changes
+          if echo "$CHANGED_FILES" | grep -q -E '\.(md|txt)$|^docs/|^README|^LICENSE'; then
+            echo "docs=true" >> $GITHUB_OUTPUT
+          else
+            echo "docs=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Detect tag information
+        id: tag
+        run: |
+          if [[ "${{ github.ref }}" =~ ^refs/tags/v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            echo "is-tag=true" >> $GITHUB_OUTPUT
+            echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            
+            # Determine release type based on version
+            MAJOR=${BASH_REMATCH[1]}
+            MINOR=${BASH_REMATCH[2]}
+            PATCH=${BASH_REMATCH[3]}
+            
+            # Get previous tag to determine release type
+            PREV_TAG=$(git tag --sort=-version:refname | grep -v '-' | sed -n '2p' || echo "")
+            if [ -n "$PREV_TAG" ]; then
+              if [[ "$PREV_TAG" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+                PREV_MAJOR=${BASH_REMATCH[1]}
+                PREV_MINOR=${BASH_REMATCH[2]}
+                PREV_PATCH=${BASH_REMATCH[3]}
+                
+                if [ "$MAJOR" -gt "$PREV_MAJOR" ]; then
+                  echo "release-type=major" >> $GITHUB_OUTPUT
+                elif [ "$MINOR" -gt "$PREV_MINOR" ]; then
+                  echo "release-type=minor" >> $GITHUB_OUTPUT
+                else
+                  echo "release-type=patch" >> $GITHUB_OUTPUT
+                fi
+              fi
+            else
+              echo "release-type=first" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "is-tag=false" >> $GITHUB_OUTPUT
+            echo "name=" >> $GITHUB_OUTPUT
+            echo "release-type=" >> $GITHUB_OUTPUT
+          fi
+
+  # Job 2: Test (runs on code changes or PRs)
+  test:
+    runs-on: ${{ env.UBUNTU_VERSION }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.has-code-changes == 'true' || github.event_name == 'pull_request' }}
+    name: Test Certificate Action
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # Test 1: Local file installation
+      - name: Create test certificate
+        run: |
+          mkdir -p test-certs
+          openssl req -x509 -newkey rsa:2048 -keyout test-certs/test-key.pem \
+            -out test-certs/test-ca.crt -days 365 -nodes \
+            -subj "/C=US/ST=Test/L=Test/O=Test/CN=test.example.com"
+      
+      - name: Test - Local file installation
+        uses: ./
+        with:
+          certificate-source: 'test-certs/test-ca.crt'
+          debug: 'true'
+      
+      - name: Verify local file installation
+        run: |
+          if [ -f /usr/local/share/ca-certificates/custom-ca-*.crt ]; then
+            echo "✓ Certificate installed from local file"
+          else
+            echo "✗ Certificate not found in system CA store"
+            exit 1
+          fi
+      
+      # Test 2: BuildKit generation
+      - name: Test - BuildKit generation
+        id: buildkit-test
+        uses: ./
+        with:
+          certificate-source: 'test-certs/test-ca.crt'
+          certificate-name: 'buildkit-test.crt'
+          generate-buildkit: 'true'
+          debug: 'true'
+      
+      - name: Verify BuildKit generation
+        run: |
+          BUILDKIT_PATH="${{ steps.buildkit-test.outputs.buildkit-path }}"
+          if [ -f "$BUILDKIT_PATH" ]; then
+            echo "✓ buildkit.toml generated successfully"
+            echo "  Path: $BUILDKIT_PATH"
+            
+            # Verify buildkit.toml content and structure
+            if grep -q "buildkit-test.crt" "$BUILDKIT_PATH" && grep -q "\[worker.oci\]" "$BUILDKIT_PATH"; then
+              echo "✓ buildkit.toml has correct content and structure"
+            else
+              echo "✗ buildkit.toml missing required content or structure"
+              exit 1
+            fi
+          else
+            echo "✗ buildkit.toml not generated"
+            exit 1
+          fi
+      
+      - name: Test Summary
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ All tests passed successfully!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  # Job 3: Build and Package (runs on code changes or tag pushes)
+  build:
+    runs-on: ${{ env.UBUNTU_VERSION }}
+    needs: [detect-changes, test]
+    if: ${{ always() && (needs.detect-changes.outputs.has-code-changes == 'true' || needs.detect-changes.outputs.is-tag == 'true') && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    name: Build and Package
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Build validation
+        run: |
+          echo "🔨 Building and validating action..."
+          
+          # Validate action.yml
+          if [ -f "action.yml" ]; then
+            echo "✓ action.yml found"
+          else
+            echo "✗ action.yml not found"
+            exit 1
+          fi
+          
+          # Validate install script
+          if [ -f "install-certificate.sh" ]; then
+            echo "✓ install-certificate.sh found"
+            chmod +x install-certificate.sh
+            
+            # Test script syntax
+            bash -n install-certificate.sh
+            echo "✓ install-certificate.sh syntax valid"
+          else
+            echo "✗ install-certificate.sh not found"
+            exit 1
+          fi
+          
+          # Create package manifest
+          cat > package-manifest.json << EOF
+          {
+            "name": "docker-ca-certificate-action",
+            "version": "${{ needs.detect-changes.outputs.tag-name || 'dev' }}",
+            "build_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "git_sha": "${{ github.sha }}",
+            "git_ref": "${{ github.ref_name }}",
+            "platform": "${{ runner.os }}",
+            "node_version": "${{ env.NODE_VERSION }}"
+          }
+          EOF
+          
+          echo "📦 Package manifest created:"
+          cat package-manifest.json
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-package-${{ github.sha }}
+          path: |
+            action.yml
+            install-certificate.sh
+            package.json
+            package-manifest.json
+          retention-days: 30
+
+  # Job 4: Release (runs only on tag pushes)
+  release:
+    runs-on: ${{ env.UBUNTU_VERSION }}
+    needs: [detect-changes, test, build]
+    if: ${{ needs.detect-changes.outputs.is-tag == 'true' && needs.build.result == 'success' }}
+    name: Create Release
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Generate changelog
+        run: |
+          TAG_NAME="${{ needs.detect-changes.outputs.tag-name }}"
+          RELEASE_TYPE="${{ needs.detect-changes.outputs.release-type }}"
+          
+          echo "📝 Generating changelog for $TAG_NAME ($RELEASE_TYPE release)"
+          
+          # Get previous release tag
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v '-' | sed -n '2p' || echo "")
+          
+          if [ -n "$PREV_TAG" ]; then
+            echo "📋 Changes since $PREV_TAG:"
+            COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "📋 All changes (first release):"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Create release notes
+          cat > release-notes.md << EOF
+          ## Release $TAG_NAME
+          
+          **Version:** \`$TAG_NAME\`  
+          **Type:** $RELEASE_TYPE release  
+          **Date:** $(date +%Y-%m-%d)  
+          **Commit:** \`${{ github.sha }}\`
+          
+          ### Changes
+          
+          $COMMITS
+          
+          ### Usage
+          
+          \`\`\`yaml
+          - uses: LiquidLogicLabs/docker-ca-certificate@$TAG_NAME
+            with:
+              certificate-source: 'path/to/cert.crt'
+          \`\`\`
+          
+          ### Installation
+          
+          The certificate will be installed to the system CA store and trusted by:
+          - ✅ Docker (push/pull from registries with custom certs)
+          - ✅ curl, wget, and other HTTP clients
+          - ✅ pip, npm, apt, and other package managers
+          - ✅ Git operations over HTTPS
+          - ✅ Any tool that uses the system CA store
+          EOF
+          
+          echo "📄 Release notes generated:"
+          cat release-notes.md
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.detect-changes.outputs.tag-name }}
+          release_name: Release ${{ needs.detect-changes.outputs.tag-name }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ contains(needs.detect-changes.outputs.tag-name, '-') }}
+      
+      - name: Update major version tags
+        if: ${{ !contains(needs.detect-changes.outputs.tag-name, '-') }}
+        run: |
+          # Extract major version (e.g., v1.2.3 -> v1)
+          MAJOR_VERSION=$(echo "${{ needs.detect-changes.outputs.tag-name }}" | sed 's/v\([0-9]*\).*/v\1/')
+          
+          # Delete existing major version tag if it exists
+          if git rev-parse "$MAJOR_VERSION" >/dev/null 2>&1; then
+            git tag -d "$MAJOR_VERSION"
+            git push origin :refs/tags/"$MAJOR_VERSION"
+          fi
+          
+          # Create new major version tag
+          git tag -a "$MAJOR_VERSION" -m "Version $MAJOR_VERSION"
+          git push origin "$MAJOR_VERSION"
+          
+          echo "🏷️ Updated major version tag: $MAJOR_VERSION"
+      
+      - name: Release Summary
+        run: |
+          echo "## 🎉 Release Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ needs.detect-changes.outputs.tag-name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type**: ${{ needs.detect-changes.outputs.release-type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Release**: [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ needs.detect-changes.outputs.tag-name }})" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ contains(needs.detect-changes.outputs.tag-name, '-') }}" = "true" ]; then
+            echo "- **Status**: ⚠️ Pre-release (for testing)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: ✅ Stable release" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -1,0 +1,35 @@
+{
+  "name": "docker-ca-certificate-action",
+  "version": "1.0.1",
+  "description": "GitHub Action for installing custom SSL/TLS certificates",
+  "private": true,
+  "scripts": {
+    "release": "standard-version --release-as patch && git push --follow-tags origin HEAD",
+    "release:patch": "standard-version --release-as patch && git push --follow-tags origin HEAD",
+    "release:minor": "standard-version --release-as minor && git push --follow-tags origin HEAD", 
+    "release:major": "standard-version --release-as major && git push --follow-tags origin HEAD",
+    "release:pre-alpha": "standard-version --prerelease alpha && git push --follow-tags origin HEAD",
+    "release:pre-beta": "standard-version --prerelease beta && git push --follow-tags origin HEAD",
+    "release:pre-rc": "standard-version --prerelease rc && git push --follow-tags origin HEAD",
+    "release:pre-dev": "standard-version --prerelease patch --prereleaseId dev && git push --follow-tags origin HEAD",
+    "build": "echo 'Build completed - action is ready for packaging'",
+    "test": "act -j test",
+    "test:local": "act -j test --local",
+    "ci:local": "act push --local",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+  },
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  },
+  "standard-version": {
+    "scripts": {
+      "precommit": "git add CHANGELOG.md package.json"
+    },
+    "skip": {
+      "tag": false
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

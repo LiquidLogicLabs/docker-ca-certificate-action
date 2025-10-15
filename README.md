@@ -116,17 +116,9 @@ uses: LiquidLogicLabs/docker-ca-certificate@v1  # Gets latest v1.x.x
 - 📖 [Examples](docs/EXAMPLES.md) - Comprehensive usage examples
 - 🔧 [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
 - 📋 [Requirements](docs/REQUIREMENTS.md) - Detailed requirements
-
-### For Maintainers
-
-- 🔄 [Release Workflow](docs/RELEASE-WORKFLOW.md) - Complete CI/CD workflow guide
-- 🏷️ [Release Types](docs/RELEASE-TYPES.md) - Pre-release vs Official release
-- ⚡ [Quick Start: Releases](docs/QUICK-START-RELEASE.md) - TL;DR release guide
+- 🚀 [Release Guide](docs/RELEASE.md) - Ultra-simple release automation
 - 🧪 [Local Testing](docs/LOCAL-TESTING.md) - Test with act (`./act-build.sh`)
-- 🚀 [Quick Release Guide](docs/QUICK-RELEASE.md) - One-command releases
 - 📦 [Publishing Guide](docs/PUBLISH.md) - Publishing to GitHub
-- ⚙️ [Release Setup](docs/RELEASE-SETUP.md) - Release automation setup
-- 🧪 [Testing Releases](docs/TEST-RELEASE.md) - Testing before release
 
 ## Troubleshooting
 
