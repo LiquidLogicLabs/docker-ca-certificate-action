@@ -259,7 +259,7 @@ jobs:
   release:
     runs-on: ubuntu-22.04
     needs: [detect-changes, test, build]
-    if: ${{ needs.detect-changes.outputs.is-tag == 'true' && needs.build.result == 'success' }}
+    if: ${{ needs.detect-changes.outputs.is-tag-push == 'true' && needs.build.result == 'success' }}
     name: Create Release
     
     steps:
