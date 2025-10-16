@@ -232,7 +232,7 @@ jobs:
           # Create package manifest
           cat > package-manifest.json << EOF
           {
-            "name": "docker-ca-certificate-action",
+            "name": "ca-certificate-import-action",
             "version": "${{ needs.detect-changes.outputs.tag-name || 'dev' }}",
             "build_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "git_sha": "${{ github.sha }}",
@@ -312,7 +312,7 @@ jobs:
           ### Usage
           
           \`\`\`yaml
-          - uses: LiquidLogicLabs/docker-ca-certificate-action@$TAG_NAME
+          - uses: LiquidLogicLabs/ca-certificate-import-action@$TAG_NAME
             with:
               certificate-source: 'path/to/cert.crt'
           \`\`\`

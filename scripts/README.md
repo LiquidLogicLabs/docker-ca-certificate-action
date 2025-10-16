@@ -1,12 +1,12 @@
 # Scripts Directory
 
-This directory contains utility scripts for the Docker Certificate Action project.
+This directory contains utility scripts for the CA Certificate Import Action project.
 
 ## Available Scripts
 
 ### `install-dependencies.sh`
 
-Installs all required dependencies for the Docker Certificate Action project.
+Installs all required dependencies for the CA Certificate Import Action project.
 
 **Usage:**
 ```bash
@@ -39,7 +39,7 @@ Installs all required dependencies for the Docker Certificate Action project.
 
 **Example Output:**
 ```
-🔧 Docker Certificate Action - Dependency Installer
+🔧 CA Certificate Import Action - Dependency Installer
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [INFO] Detected operating system: ubuntu
@@ -62,6 +62,6 @@ chmod +x scripts/*.sh
 
 Run from the project root directory:
 ```bash
-cd /path/to/docker-ca-certificate
+cd /path/to/ca-certificate-import-action
 ./scripts/install-dependencies.sh
 ```

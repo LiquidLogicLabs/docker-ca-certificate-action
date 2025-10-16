@@ -2,16 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [1.0.4](https://github.com/LiquidLogicLabs/docker-ca-certificate-action/compare/v1.0.3...v1.0.4) (2025-10-15)
+### [1.0.4](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.3...v1.0.4) (2025-10-15)
 
-### [1.0.3](https://github.com/LiquidLogicLabs/docker-ca-certificate-action/compare/v1.0.2...v1.0.3) (2025-10-15)
+### [1.0.3](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.2...v1.0.3) (2025-10-15)
 
-### [1.0.2](https://github.com/LiquidLogicLabs/docker-ca-certificate-action/compare/v1.0.1...v1.0.2) (2025-10-15)
+### [1.0.2](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.1...v1.0.2) (2025-10-15)
 
 
 ### Features
 
-* implement unified CI/CD pipeline with tag-based releases ([cd9fadd](https://github.com/LiquidLogicLabs/docker-ca-certificate-action/commit/cd9fadd2e8538338bcb283bf3d9291d6472a2814))
+* implement unified CI/CD pipeline with tag-based releases ([cd9fadd](https://github.com/LiquidLogicLabs/ca-certificate-import-action/commit/cd9fadd2e8538338bcb283bf3d9291d6472a2814))
 
 ## [1.0.0] - TBD (Pending First Release)
 

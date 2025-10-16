@@ -1,5 +1,5 @@
 #!/bin/bash
-# install-dependencies.sh - Install all required dependencies for the Docker Certificate Action
+# install-dependencies.sh - Install all required dependencies for the CA Certificate Import Action
 # This script checks for and installs dependencies if they are not already present
 
 set -e
@@ -213,7 +213,7 @@ verify_nodejs_version() {
 # Main installation function
 main() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}🔧 Docker Certificate Action - Dependency Installer${NC}"
+    echo -e "${BLUE}🔧 CA Certificate Import Action - Dependency Installer${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     

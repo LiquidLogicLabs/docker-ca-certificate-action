@@ -1,5 +1,5 @@
-name: 'Docker Certificate Installer'
-description: 'Install custom SSL/TLS certificates for Docker build environments'
+name: 'CA Certificate Import'
+description: 'Install custom SSL/TLS certificates for build environments'
 author: 'LiquidLogicLabs'
 
 branding:

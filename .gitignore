@@ -37,3 +37,9 @@ build/
 # Release notes (temporary)
 release-notes.md
 
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+

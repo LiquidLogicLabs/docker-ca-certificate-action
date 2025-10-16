@@ -1,4 +1,4 @@
-# Docker Certificate GitHub Action
+# CA Certificate Import GitHub Action
 
 A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner environment, enabling Docker and other tools to work with private registries and internal resources that use custom certificate authorities.
 
@@ -17,7 +17,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install custom certificate
-  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
+  uses: LiquidLogicLabs/ca-certificate-import-action@v1
   with:
     certificate-source: 'certs/company-ca.crt'
 ```
@@ -26,7 +26,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install certificate from URL
-  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
+  uses: LiquidLogicLabs/ca-certificate-import-action@v1
   with:
     certificate-source: 'https://pki.company.com/ca.crt'
 ```
@@ -35,7 +35,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 
 ```yaml
 - name: Install certificate from secret
-  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
+  uses: LiquidLogicLabs/ca-certificate-import-action@v1
   with:
     certificate-source: 'inline'
     certificate-body: ${{ secrets.CUSTOM_CA_CERT }}
@@ -47,7 +47,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 ```yaml
 - name: Install certificate and generate buildkit.toml
   id: install-cert
-  uses: LiquidLogicLabs/docker-ca-certificate-action@v1
+  uses: LiquidLogicLabs/ca-certificate-import-action@v1
   with:
     certificate-source: 'certs/company-ca.crt'
     generate-buildkit: 'true'
@@ -100,7 +100,32 @@ Once installed, the certificate is trusted by:
 - Ubuntu runner (tested on ubuntu-22.04)
 - Appropriate permissions to write to system directories
 
-📋 **Full requirements:** See [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
+### Input Methods
+
+The action supports three methods for providing certificates:
+
+1. **Local File Path** - Reference a certificate file in the repository
+   ```yaml
+   certificate-source: 'certs/company-ca.crt'
+   ```
+
+2. **URL** - Download certificate from a web location
+   ```yaml
+   certificate-source: 'https://pki.company.com/ca.crt'
+   ```
+
+3. **Certificate Body** - Provide certificate content directly
+   ```yaml
+   certificate-source: 'inline'
+   certificate-body: ${{ secrets.CUSTOM_CA_CERT }}
+   ```
+
+### Use Cases
+
+- **Private Docker Registry**: Install corporate CA to pull/push images
+- **Internal Resources**: Access internal URLs during build (pip, npm, etc.)
+- **Development Environments**: Support self-signed certificates in test pipelines
+- **Security Compliance**: Use organization-specific certificate authorities
 
 ## Versioning
 
@@ -108,7 +133,7 @@ This action follows [Semantic Versioning](https://semver.org/).
 
 **Recommended usage:**
 ```yaml
-uses: LiquidLogicLabs/docker-ca-certificate-action@v1  # Gets latest v1.x.x
+uses: LiquidLogicLabs/ca-certificate-import-action@v1  # Gets latest v1.x.x
 ```
 
 ## 🚀 Quick Release
@@ -119,16 +144,14 @@ npm run release:minor      # New features
 npm run release:major      # Breaking changes
 ```
 
-See [docs/RELEASE.md](docs/RELEASE.md) for full release automation guide.
+See [docs/MAINTAINERS.md](docs/MAINTAINERS.md) for full release automation guide.
 
 ## Documentation
 
 - 📖 [Examples](docs/EXAMPLES.md) - Comprehensive usage examples
 - 🔧 [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
-- 📋 [Requirements](docs/REQUIREMENTS.md) - Detailed requirements
-- 🚀 [Release Guide](docs/RELEASE.md) - Ultra-simple release automation
-- 🧪 [Local Testing](docs/LOCAL-TESTING.md) - Test with act (`./act-build.sh`)
-- 📦 [Publishing Guide](docs/PUBLISH.md) - Publishing to GitHub
+- 🛠️ [Contributing](docs/CONTRIBUTING.md) - Development guidelines
+- 👥 [Maintainers](docs/MAINTAINERS.md) - Publishing, testing, and release automation
 
 ## Troubleshooting
 
