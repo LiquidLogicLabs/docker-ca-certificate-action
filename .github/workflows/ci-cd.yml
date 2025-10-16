@@ -338,24 +338,6 @@ jobs:
           draft: false
           prerelease: ${{ contains(needs.detect-changes.outputs.tag-name, '-') }}
       
-      - name: Update major version tags
-        if: ${{ !contains(needs.detect-changes.outputs.tag-name, '-') }}
-        run: |
-          # Extract major version (e.g., v1.2.3 -> v1)
-          MAJOR_VERSION=$(echo "${{ needs.detect-changes.outputs.tag-name }}" | sed 's/v\([0-9]*\).*/v\1/')
-          
-          # Delete existing major version tag if it exists
-          if git rev-parse "$MAJOR_VERSION" >/dev/null 2>&1; then
-            git tag -d "$MAJOR_VERSION"
-            git push origin :refs/tags/"$MAJOR_VERSION"
-          fi
-          
-          # Create new major version tag
-          git tag -a "$MAJOR_VERSION" -m "Version $MAJOR_VERSION"
-          git push origin "$MAJOR_VERSION"
-          
-          echo "🏷️ Updated major version tag: $MAJOR_VERSION"
-      
       - name: Release Summary
         run: |
           echo "## 🎉 Release Complete!" >> $GITHUB_STEP_SUMMARY
