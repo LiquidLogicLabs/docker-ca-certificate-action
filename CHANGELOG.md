@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.5](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.4...v1.0.5) (2025-10-16)
+
+
+### Features
+
+* reorganize documentation and update repository references ([60a05c8](https://github.com/LiquidLogicLabs/ca-certificate-import-action/commit/60a05c84883fc8e183d57d957fd6ea08edaf39b9))
+
 ### [1.0.4](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.3...v1.0.4) (2025-10-15)
 
 ### [1.0.3](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.2...v1.0.3) (2025-10-15)
