@@ -30,12 +30,11 @@ permissions:
 env:
   # Environment variables for cross-platform compatibility
   NODE_VERSION: '18'
-  UBUNTU_VERSION: 'ubuntu-22.04'
 
 jobs:
   # Job 1: Detect changes and determine pipeline behavior
   detect-changes:
-    runs-on: ${{ env.UBUNTU_VERSION }}
+    runs-on: ubuntu-22.04
     outputs:
       has-code-changes: ${{ steps.changes.outputs.code }}
       has-docs-changes: ${{ steps.changes.outputs.docs }}
@@ -112,7 +111,7 @@ jobs:
 
   # Job 2: Test (runs on code changes or PRs)
   test:
-    runs-on: ${{ env.UBUNTU_VERSION }}
+    runs-on: ubuntu-22.04
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.has-code-changes == 'true' || github.event_name == 'pull_request' }}
     name: Test Certificate Action
@@ -184,7 +183,7 @@ jobs:
 
   # Job 3: Build and Package (runs on code changes or tag pushes)
   build:
-    runs-on: ${{ env.UBUNTU_VERSION }}
+    runs-on: ubuntu-22.04
     needs: [detect-changes, test]
     if: ${{ always() && (needs.detect-changes.outputs.has-code-changes == 'true' || needs.detect-changes.outputs.is-tag == 'true') && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
     name: Build and Package
@@ -258,7 +257,7 @@ jobs:
 
   # Job 4: Release (runs only on tag pushes)
   release:
-    runs-on: ${{ env.UBUNTU_VERSION }}
+    runs-on: ubuntu-22.04
     needs: [detect-changes, test, build]
     if: ${{ needs.detect-changes.outputs.is-tag == 'true' && needs.build.result == 'success' }}
     name: Create Release
