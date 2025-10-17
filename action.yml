@@ -30,6 +30,11 @@ inputs:
     description: 'Generate buildkit.toml configuration file with CA certificate settings'
     required: false
     default: 'false'
+  
+  buildkit-runtime:
+    description: 'Container runtime for BuildKit (e.g., "io.containerd.runc.v2"). Leave empty to omit runtime configuration'
+    required: false
+    default: ''
 
 outputs:
   certificate-path:
@@ -57,4 +62,5 @@ runs:
         INPUT_CERTIFICATE_NAME: ${{ inputs.certificate-name }}
         INPUT_DEBUG: ${{ inputs.debug }}
         INPUT_GENERATE_BUILDKIT: ${{ inputs.generate-buildkit }}
+        INPUT_BUILDKIT_RUNTIME: ${{ inputs.buildkit-runtime }}
 

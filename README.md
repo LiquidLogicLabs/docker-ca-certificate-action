@@ -71,6 +71,7 @@ A GitHub Action that installs custom SSL/TLS certificates into the CI/CD runner 
 | `certificate-name` | Name for certificate file | No | Auto-generated |
 | `debug` | Enable debug output | No | `false` |
 | `generate-buildkit` | Generate buildkit.toml configuration file | No | `false` |
+| `buildkit-runtime` | Container runtime for BuildKit (e.g., 'io.containerd.runc.v2'). Leave empty to omit runtime configuration | No | - |
 
 ## Outputs
 

@@ -73,6 +73,20 @@ This document provides comprehensive examples of using the CA Certificate Import
     certificate-name: 'company-ca.crt'
     generate-buildkit: 'true'
     debug: true
+```
+
+### 7. Generate BuildKit Configuration with Custom Runtime
+
+```yaml
+- name: Install certificate and generate buildkit.toml with custom runtime
+  id: install-cert
+  uses: LiquidLogicLabs/ca-certificate-import-action@v1
+  with:
+    certificate-source: 'certs/company-ca.crt'
+    certificate-name: 'company-ca.crt'
+    generate-buildkit: 'true'
+    buildkit-runtime: 'io.containerd.runc.v2'
+    debug: true
 
 - name: Setup Docker BuildKit with custom CA
   run: |

@@ -210,15 +210,21 @@ if [ "$INPUT_GENERATE_BUILDKIT" = "true" ]; then
   #   mirrors = ["docker.io"]
   #   [worker.oci.registry.tls]
   #     ca = ["$SYSTEM_CERT_PATH"]
+EOF
 
-# Enable experimental features if needed
+    # Add runtime configuration only if specified
+    if [ -n "$INPUT_BUILDKIT_RUNTIME" ]; then
+        cat >> "$BUILDKIT_PATH" << EOF
+
+# Container runtime configuration
 [worker.containerd]
-  runtime = "io.containerd.runc.v2"
+  runtime = "$INPUT_BUILDKIT_RUNTIME"
   
 # Additional buildkit configuration
 [worker.containerd.runtimes.runc]
-  runtime_type = "io.containerd.runc.v2"
+  runtime_type = "$INPUT_BUILDKIT_RUNTIME"
 EOF
+    fi
     
     log_info "buildkit.toml generated at: $BUILDKIT_PATH"
     
