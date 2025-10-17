@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.9...v1.1.0) (2025-10-17)
+
+
+### Features
+
+* make BuildKit runtime configuration optional and configurable ([79d9062](https://github.com/LiquidLogicLabs/ca-certificate-import-action/commit/79d906233812843cd116176187370e9574955082))
+
 ### [1.0.9](https://github.com/LiquidLogicLabs/ca-certificate-import-action/compare/v1.0.8...v1.0.9) (2025-10-16)
 
 
