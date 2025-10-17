@@ -169,6 +169,52 @@ jobs:
               echo "✗ buildkit.toml missing required content or structure"
               exit 1
             fi
+            
+            # Verify no runtime configuration (default behavior)
+            if grep -q "\[worker.containerd\]" "$BUILDKIT_PATH"; then
+              echo "✗ buildkit.toml should not contain runtime configuration by default"
+              exit 1
+            else
+              echo "✓ buildkit.toml correctly omits runtime configuration by default"
+            fi
+          else
+            echo "✗ buildkit.toml not generated"
+            exit 1
+          fi
+      
+      # Test 3: BuildKit generation with custom runtime
+      - name: Test - BuildKit generation with runtime
+        id: buildkit-runtime-test
+        uses: ./
+        with:
+          certificate-source: 'test-certs/test-ca.crt'
+          certificate-name: 'buildkit-runtime-test.crt'
+          generate-buildkit: 'true'
+          buildkit-runtime: 'io.containerd.runc.v2'
+          debug: 'true'
+      
+      - name: Verify BuildKit generation with runtime
+        run: |
+          BUILDKIT_PATH="${{ steps.buildkit-runtime-test.outputs.buildkit-path }}"
+          if [ -f "$BUILDKIT_PATH" ]; then
+            echo "✓ buildkit.toml generated successfully with runtime config"
+            echo "  Path: $BUILDKIT_PATH"
+            
+            # Verify buildkit.toml content and structure
+            if grep -q "buildkit-runtime-test.crt" "$BUILDKIT_PATH" && grep -q "\[worker.oci\]" "$BUILDKIT_PATH"; then
+              echo "✓ buildkit.toml has correct content and structure"
+            else
+              echo "✗ buildkit.toml missing required content or structure"
+              exit 1
+            fi
+            
+            # Verify runtime configuration is present
+            if grep -q "\[worker.containerd\]" "$BUILDKIT_PATH" && grep -q "io.containerd.runc.v2" "$BUILDKIT_PATH"; then
+              echo "✓ buildkit.toml correctly includes runtime configuration"
+            else
+              echo "✗ buildkit.toml missing runtime configuration"
+              exit 1
+            fi
           else
             echo "✗ buildkit.toml not generated"
             exit 1
